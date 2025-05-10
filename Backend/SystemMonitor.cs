@@ -504,10 +504,10 @@ namespace PulseTune.Backend
         }
 
         // GPU bilgisi metodu ekleyelim (NVIDIA için)
-        public async Task<Dictionary<string, float>> GetGpuInfoAsync()
+        public async Task<GpuInfo> GetGpuInfoAsync()
         {
             return await Task.Run(() => {
-                Dictionary<string, float> gpuInfo = new Dictionary<string, float>();
+                GpuInfo gpuInfo = new GpuInfo();
                 
                 try
                 {
@@ -516,13 +516,12 @@ namespace PulseTune.Backend
                     {
                         foreach (ManagementObject obj in collection)
                         {
-                            string name = obj["Name"]?.ToString() ?? "Unknown GPU";
-                            gpuInfo.Add("Name", name);
+                            gpuInfo.Name = obj["Name"]?.ToString() ?? "Unknown GPU";
                             
                             if (obj["AdapterRAM"] != null)
                             {
                                 ulong ram = Convert.ToUInt64(obj["AdapterRAM"]);
-                                gpuInfo.Add("MemoryMB", ram / (1024 * 1024));
+                                gpuInfo.MemoryMB = ram / (1024 * 1024);
                             }
                             
                             break; // Sadece ilk GPU'yu al
@@ -544,6 +543,12 @@ namespace PulseTune.Backend
         public string Name { get; set; }
         public int Id { get; set; }
         public float CpuUsage { get; set; }
+        public float MemoryMB { get; set; }
+    }
+    
+    public class GpuInfo
+    {
+        public string Name { get; set; } = "Unknown GPU";
         public float MemoryMB { get; set; }
     }
 }
